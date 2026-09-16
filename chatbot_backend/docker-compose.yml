@@ -1,0 +1,39 @@
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: ./ci_cd/docker/fastapi.dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: ./services/v1
+        target: /src/app
+        read_only: true
+    env_file: ./.env
+    networks:
+      - app_network
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: ./ci_cd/docker/streamlit.dockerfile
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - type: bind
+        source: ./services/v1/streamlit_app
+        target: /app
+        read_only: true
+    environment:
+      - BACKEND_URL=http://fastapi_app:8000 # Use container name as hostname
+    networks:
+      - app_network
+    depends_on:
+      - fastapi
+
+networks:
+  app_network:
+    driver: bridge
