@@ -1,0 +1,7 @@
+services:
+  northwind_data_neo4j_etl:
+    build:
+      context: .
+      dockerfile: ./ETL_pipelines/Dockerfile
+    env_file:
+      - .env
